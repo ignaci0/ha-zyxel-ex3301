@@ -49,7 +49,7 @@ A custom Home Assistant integration that interacts with the **Zyxel EX3301-T0** 
 3. Click the three dots in the top-right corner and select **Custom repositories**.
 4. Paste the URL of this repository:
    ```text
-   https://github.com/<your-username>/ha-zyxel-ex3301
+   https://github.com/ignaci0/ha-zyxel-ex3301
    ```
 5. Set the category to **Integration** and click **Add**.
 6. Find **Zyxel EX3301-T0 (Digi)** and click **Download**.
