@@ -1,0 +1,47 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Zyxel EX3301-T0 (Digi)",
+        "description": "Enter the connection details for your Zyxel EX3301-T0 router (commonly provided by Digi).",
+        "data": {
+          "host": "Router IP / Host",
+          "username": "Username",
+          "password": "Password",
+          "scan_interval": "Update interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the router. Check the IP address and network.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This Zyxel router is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Zyxel EX3301-T0 Options",
+        "description": "Configure tracking behavior and polling frequency.",
+        "data": {
+          "scan_interval": "Scan interval (seconds)",
+          "consider_home": "Consider Home period (seconds before marking offline)",
+          "only_active": "Only track currently active devices"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "active_devices": {
+        "name": "Active Devices"
+      },
+      "total_devices": {
+        "name": "Total Devices"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Zyxel EX3301-T0 (Digi)",
+        "description": "Introduce los datos de acceso a tu router Zyxel EX3301-T0 (habitual en Digi).",
+        "data": {
+          "host": "IP o Host del router",
+          "username": "Usuario",
+          "password": "Contraseña",
+          "scan_interval": "Intervalo de actualización (segundos)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No se pudo conectar al router. Verifica la IP y la red.",
+      "invalid_auth": "Usuario o contraseña no válidos.",
+      "unknown": "Ocurrió un error inesperado."
+    },
+    "abort": {
+      "already_configured": "Este router Zyxel ya se encuentra configurado."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones Zyxel EX3301-T0",
+        "description": "Configura el seguimiento de presencia y la frecuencia de muestreo.",
+        "data": {
+          "scan_interval": "Intervalo de muestreo (segundos)",
+          "consider_home": "Tiempo para considerar en casa (segundos antes de marcar como ausente)",
+          "only_active": "Rastrear únicamente dispositivos actualmente activos"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "active_devices": {
+        "name": "Dispositivos Activos"
+      },
+      "total_devices": {
+        "name": "Total de Dispositivos"
+      }
+    }
+  }
+}

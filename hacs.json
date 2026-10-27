@@ -1,0 +1,5 @@
+{
+  "name": "Zyxel EX3301-T0 (Digi) Device Tracker",
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
+}
