@@ -165,5 +165,5 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
             connections={(CONNECTION_NETWORK_MAC, self._mac)},
             name=friendly_name,
             identifiers={(DOMAIN, self._mac)},
-            via_device=(DOMAIN, self.coordinator.entry_id),
+            via_device_id=self.coordinator.router_device_id,
         )

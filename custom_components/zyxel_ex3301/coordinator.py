@@ -25,6 +25,7 @@ class ZyxelDataUpdateCoordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]
         api: ZyxelRouterApi,
         scan_interval: int,
         entry_id: str,
+        router_device_id: str,
         options: dict[str, Any],
     ) -> None:
         """Initialize the coordinator."""
@@ -36,6 +37,7 @@ class ZyxelDataUpdateCoordinator(DataUpdateCoordinator[dict[str, dict[str, Any]]
         )
         self.api = api
         self.entry_id = entry_id
+        self.router_device_id = router_device_id
         self.options = options
         self._known_macs: set[str] = set()
         self._last_active_timestamps: dict[str, datetime] = {}

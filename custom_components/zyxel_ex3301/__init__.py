@@ -6,6 +6,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_SCAN_INTERVAL, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 
 from .api import ZyxelRouterApi
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN
@@ -37,11 +38,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         loop=hass.loop,
     )
 
+    # Pre-register the router device in the device registry so child entities can reference via_device_id
+    device_registry = dr.async_get(hass)
+    router_device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={(DOMAIN, entry.entry_id)},
+        name=f"Zyxel {api.model} ({host})",
+        manufacturer="Zyxel (Digi)",
+        model=api.model,
+        configuration_url=api.base_url,
+    )
+
     coordinator = ZyxelDataUpdateCoordinator(
         hass=hass,
         api=api,
         scan_interval=scan_interval,
         entry_id=entry.entry_id,
+        router_device_id=router_device.id,
         options=entry.options,
     )
 
