@@ -95,6 +95,7 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
     """Representation of a device tracked through Zyxel EX3301-T0."""
 
     _attr_has_entity_name = True
+    _attr_name = None
 
     def __init__(self, coordinator: ZyxelDataUpdateCoordinator, mac: str) -> None:
         """Initialize the device tracker."""
@@ -106,14 +107,6 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
     def _dev_data(self) -> dict[str, Any]:
         """Return the device data from the coordinator."""
         return self.coordinator.data.get(self._mac, {})
-
-    @property
-    def name(self) -> str | None:
-        """Return the friendly name of the entity."""
-        hostname = self._dev_data.get("hostname")
-        if hostname and hostname != "Unknown":
-            return hostname
-        return self._mac
 
     @property
     def is_connected(self) -> bool:
@@ -170,7 +163,7 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
         friendly_name = hostname if (hostname and hostname != "Unknown") else self._mac
         return DeviceInfo(
             connections={(CONNECTION_NETWORK_MAC, self._mac)},
-            default_name=friendly_name,
+            name=friendly_name,
             identifiers={(DOMAIN, self._mac)},
             via_device=(DOMAIN, self.coordinator.entry_id),
         )

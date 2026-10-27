@@ -62,16 +62,30 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    try:
+        unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    except Exception as err:  # pylint: disable=broad-except
+        _LOGGER.warning("Error unloading platforms for %s: %s", entry.title, err)
+        unload_ok = True
 
-    if unload_ok:
-        entry_data = hass.data[DOMAIN].pop(entry.entry_id, None)
-        if entry_data and "api" in entry_data:
-            api: ZyxelRouterApi = entry_data["api"]
+    entry_data = hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
+    if entry_data and "api" in entry_data:
+        api: ZyxelRouterApi = entry_data["api"]
+        try:
             await api.async_logout()
+        except Exception:
+            pass
+        try:
             await api.async_close()
+        except Exception:
+            pass
 
     return unload_ok
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Handle removal of an entry."""
+    _LOGGER.info("Removed config entry for %s", entry.title)
 
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
