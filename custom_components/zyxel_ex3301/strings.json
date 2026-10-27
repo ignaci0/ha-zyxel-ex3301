@@ -10,6 +10,14 @@
           "password": "Password",
           "scan_interval": "Update interval (seconds)"
         }
+      },
+      "devices": {
+        "title": "Select Devices to Track",
+        "description": "Select which devices to track. Devices show their name, MAC address in braces, and IP.",
+        "data": {
+          "tracked_devices": "Devices to track",
+          "track_new_devices": "Automatically track newly discovered devices"
+        }
       }
     },
     "error": {
@@ -25,11 +33,12 @@
     "step": {
       "init": {
         "title": "Zyxel EX3301-T0 Options",
-        "description": "Configure tracking behavior and polling frequency.",
+        "description": "Add or remove tracked devices, update polling frequency, or adjust presence timeout.",
         "data": {
+          "tracked_devices": "Devices to track",
+          "track_new_devices": "Automatically track newly discovered devices",
           "scan_interval": "Scan interval (seconds)",
-          "consider_home": "Consider Home period (seconds before marking offline)",
-          "only_active": "Only track currently active devices"
+          "consider_home": "Consider Home period (seconds before marking offline)"
         }
       }
     }

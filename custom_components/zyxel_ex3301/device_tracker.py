@@ -7,6 +7,7 @@ from typing import Any
 from homeassistant.components.device_tracker import ScannerEntity, SourceType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -23,7 +24,8 @@ from .const import (
     ATTR_PHY_RATE,
     ATTR_RSSI,
     ATTR_SNR,
-    CONF_ONLY_ACTIVE,
+    CONF_TRACK_NEW_DEVICES,
+    CONF_TRACKED_DEVICES,
     DOMAIN,
 )
 from .coordinator import ZyxelDataUpdateCoordinator
@@ -40,11 +42,23 @@ async def async_setup_entry(
     coordinator: ZyxelDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     tracked: set[str] = set()
 
-    only_active = entry.options.get(CONF_ONLY_ACTIVE, False)
+    tracked_devices_opt: list[str] | None = entry.options.get(CONF_TRACKED_DEVICES)
+    track_new: bool = entry.options.get(CONF_TRACK_NEW_DEVICES, False)
+    tracked_whitelist: set[str] | None = set(tracked_devices_opt) if tracked_devices_opt is not None else None
+
+    # Clean up entity registry entries that were removed from whitelist in options
+    ent_reg = er.async_get(hass)
+    existing_entries = er.async_entries_for_config_entry(ent_reg, entry.entry_id)
+    for entity_entry in existing_entries:
+        if entity_entry.domain == "device_tracker":
+            mac = entity_entry.unique_id.replace(f"{entry.entry_id}_", "")
+            if tracked_whitelist is not None and mac not in tracked_whitelist:
+                _LOGGER.info("Removing unwhitelisted device %s (%s)", entity_entry.entity_id, mac)
+                ent_reg.async_remove(entity_entry.entity_id)
 
     @callback
     def async_add_devices(new_macs: list[str] | None = None) -> None:
-        """Add newly discovered devices as entities."""
+        """Add newly discovered devices as entities if whitelisted."""
         entities: list[ZyxelDeviceTracker] = []
         macs_to_check = new_macs if new_macs is not None else list(coordinator.data.keys())
 
@@ -56,8 +70,11 @@ async def async_setup_entry(
             if not dev_data:
                 continue
 
-            if only_active and not dev_data.get("active"):
-                continue
+            if tracked_whitelist is not None:
+                if mac not in tracked_whitelist:
+                    if not track_new:
+                        continue
+                    tracked_whitelist.add(mac)
 
             tracked.add(mac)
             entities.append(ZyxelDeviceTracker(coordinator, mac))
@@ -65,10 +82,10 @@ async def async_setup_entry(
         if entities:
             async_add_entities(entities)
 
-    # Add initial batch
+    # Initial batch setup
     async_add_devices()
 
-    # Listen for new devices discovered in future updates
+    # Listen for newly seen devices
     entry.async_on_unload(
         async_dispatcher_connect(hass, coordinator.signal_new_device, async_add_devices)
     )
@@ -92,7 +109,7 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
 
     @property
     def name(self) -> str | None:
-        """Return the name of the entity."""
+        """Return the friendly name of the entity."""
         hostname = self._dev_data.get("hostname")
         if hostname and hostname != "Unknown":
             return hostname

@@ -8,8 +8,9 @@ DEFAULT_USERNAME = "user"
 DEFAULT_SCAN_INTERVAL = 30
 DEFAULT_CONSIDER_HOME = 180
 
-CONF_CONSIDER_HOME = "consider_home"
+CONF_TRACKED_DEVICES = "tracked_devices"
 CONF_TRACK_NEW_DEVICES = "track_new_devices"
+CONF_CONSIDER_HOME = "consider_home"
 CONF_ONLY_ACTIVE = "only_active"
 
 ATTR_CONNECTION_TYPE = "connection_type"

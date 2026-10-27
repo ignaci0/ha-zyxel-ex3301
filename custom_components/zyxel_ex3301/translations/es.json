@@ -10,6 +10,14 @@
           "password": "Contraseña",
           "scan_interval": "Intervalo de actualización (segundos)"
         }
+      },
+      "devices": {
+        "title": "Seleccionar dispositivos a rastrear",
+        "description": "Elige qué dispositivos monitorizar en Home Assistant. Se muestra el nombre, la dirección MAC entre paréntesis y la IP.",
+        "data": {
+          "tracked_devices": "Dispositivos a rastrear",
+          "track_new_devices": "Rastrear automáticamente dispositivos nuevos detectados"
+        }
       }
     },
     "error": {
@@ -25,11 +33,12 @@
     "step": {
       "init": {
         "title": "Opciones Zyxel EX3301-T0",
-        "description": "Configura el seguimiento de presencia y la frecuencia de muestreo.",
+        "description": "Añade o elimina dispositivos a monitorizar, cambia el intervalo de muestreo o el tiempo de presencia.",
         "data": {
+          "tracked_devices": "Dispositivos a rastrear",
+          "track_new_devices": "Rastrear automáticamente dispositivos nuevos detectados",
           "scan_interval": "Intervalo de muestreo (segundos)",
-          "consider_home": "Tiempo para considerar en casa (segundos antes de marcar como ausente)",
-          "only_active": "Rastrear únicamente dispositivos actualmente activos"
+          "consider_home": "Tiempo para considerar en casa (segundos antes de marcar como ausente)"
         }
       }
     }
