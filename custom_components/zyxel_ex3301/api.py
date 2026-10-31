@@ -191,18 +191,30 @@ class ZyxelRouterApi:
             raise ZyxelConnectionError(f"Connection error to {self.base_url}: {err}") from err
 
     async def async_get_lanhosts(self) -> list[dict[str, Any]]:
-        """Fetch and decrypt the list of LAN and WLAN hosts."""
+        """Fetch and decrypt the list of LAN and WLAN hosts.
+
+        The EX3301 builds its host table on demand (one entry per client, with
+        RSSI and PHY rate), which takes several seconds and occasionally makes
+        the router answer 504 or drop past the request timeout. One retry
+        absorbs that; without it a single slow read marks every tracked device
+        unavailable until the next successful poll.
+        """
         if not self._session_key:
             await self.async_login()
 
         for attempt in (1, 2):
             try:
-                hosts = await self._fetch_lanhosts_raw()
-                return hosts
+                return await self._fetch_lanhosts_raw()
             except ZyxelAuthError:
                 if attempt == 1:
                     _LOGGER.info("Session expired for %s, re-authenticating...", self.base_url)
                     await self.async_login()
+                else:
+                    raise
+            except ZyxelConnectionError as err:
+                if attempt == 1:
+                    _LOGGER.debug("Host table read failed (attempt 1): %s - retrying", err)
+                    await asyncio.sleep(3)
                 else:
                     raise
 
@@ -220,11 +232,13 @@ class ZyxelRouterApi:
             async with session.get(
                 f"{self.base_url}/cgi-bin/DAL?oid=lanhosts",
                 headers=headers,
-                timeout=aiohttp.ClientTimeout(total=10),
+                timeout=aiohttp.ClientTimeout(total=30),
             ) as resp:
                 if resp.status in (401, 403):
                     raise ZyxelAuthError(f"Unauthorized (HTTP {resp.status})")
                 if resp.status != 200:
+                    # Drain the body so the connection can go back to the pool.
+                    await resp.read()
                     raise ZyxelConnectionError(f"HTTP error {resp.status} fetching lanhosts")
                 data = await resp.json(content_type=None)
 
