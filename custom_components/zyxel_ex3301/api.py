@@ -212,8 +212,13 @@ class ZyxelRouterApi:
         except (aiohttp.ClientError, asyncio.TimeoutError) as err:
             raise ZyxelConnectionError(f"Connection error to {self.base_url}: {err}") from err
 
-    async def _fetch_dal_objects(self, oid: str) -> list[dict[str, Any]]:
-        """Fetch and decrypt DAL objects for a given OID with automatic re-auth."""
+    async def _fetch_dal_objects(self, oid: str, timeout: float = 10) -> list[dict[str, Any]]:
+        """Fetch and decrypt DAL objects for a given OID with automatic re-auth.
+
+        `timeout` is per call because the OIDs differ by an order of magnitude:
+        status/wan answer in well under a second, while lanhosts rebuilds the
+        whole host table on demand and takes ~10 s on an EX3301.
+        """
         if not self._session_key:
             await self.async_login()
 
@@ -227,11 +232,13 @@ class ZyxelRouterApi:
                 async with session.get(
                     f"{self.base_url}/cgi-bin/DAL?oid={oid}",
                     headers=headers,
-                    timeout=aiohttp.ClientTimeout(total=10),
+                    timeout=aiohttp.ClientTimeout(total=timeout),
                 ) as resp:
                     if resp.status in (401, 403):
                         raise ZyxelAuthError(f"Unauthorized (HTTP {resp.status})")
                     if resp.status != 200:
+                        # Drain the body so the connection can go back to the pool.
+                        await resp.read()
                         raise ZyxelConnectionError(f"HTTP error {resp.status} fetching oid={oid}")
                     data = await resp.json(content_type=None)
 
@@ -257,13 +264,18 @@ class ZyxelRouterApi:
                 else:
                     raise
             except (aiohttp.ClientError, asyncio.TimeoutError) as err:
-                raise ZyxelConnectionError(f"Communication error: {err}") from err
+                error = ZyxelConnectionError(f"Communication error: {err}")
+                if attempt == 1:
+                    _LOGGER.debug("DAL oid=%s failed (attempt 1): %s - retrying", oid, error)
+                    await asyncio.sleep(3)
+                else:
+                    raise error from err
 
         return []
 
     async def async_get_lanhosts(self) -> list[dict[str, Any]]:
         """Fetch and decrypt the list of LAN and WLAN hosts."""
-        objects = await self._fetch_dal_objects("lanhosts")
+        objects = await self._fetch_dal_objects("lanhosts", timeout=30)
         if objects and isinstance(objects, list):
             return objects[0].get("lanhosts", [])
         return []
