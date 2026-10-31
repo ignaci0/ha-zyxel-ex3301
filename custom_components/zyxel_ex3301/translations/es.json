@@ -3,9 +3,9 @@
     "step": {
       "user": {
         "title": "Zyxel EX3301-T0 (Digi)",
-        "description": "Introduce los datos de acceso a tu router Zyxel EX3301-T0 (habitual en Digi).",
+        "description": "Introduce los datos de conexión para tu router Zyxel EX3301-T0 (proporcionado habitualmente por Digi).",
         "data": {
-          "host": "IP o Host del router",
+          "host": "IP / Host del router",
           "username": "Usuario",
           "password": "Contraseña",
           "scan_interval": "Intervalo de actualización (segundos)"
@@ -13,32 +13,32 @@
       },
       "devices": {
         "title": "Seleccionar dispositivos a rastrear",
-        "description": "Elige qué dispositivos monitorizar en Home Assistant. Se muestra el nombre, la dirección MAC entre paréntesis y la IP.",
+        "description": "Elige qué dispositivos deseas rastrear. Se muestra el nombre, dirección MAC entre paréntesis e IP.",
         "data": {
           "tracked_devices": "Dispositivos a rastrear",
-          "track_new_devices": "Rastrear automáticamente dispositivos nuevos detectados"
+          "track_new_devices": "Rastrear automáticamente nuevos dispositivos descubiertos"
         }
       }
     },
     "error": {
-      "cannot_connect": "No se pudo conectar al router. Verifica la IP y la red.",
-      "invalid_auth": "Usuario o contraseña no válidos.",
+      "cannot_connect": "No se pudo conectar con el router. Comprueba la dirección IP y la red.",
+      "invalid_auth": "Usuario o contraseña inválidos.",
       "unknown": "Ocurrió un error inesperado."
     },
     "abort": {
-      "already_configured": "Este router Zyxel ya se encuentra configurado."
+      "already_configured": "Este router Zyxel ya está configurado."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Opciones Zyxel EX3301-T0",
-        "description": "Añade o elimina dispositivos a monitorizar, cambia el intervalo de muestreo o el tiempo de presencia.",
+        "title": "Opciones de Zyxel EX3301-T0",
+        "description": "Añade o quita dispositivos rastreados, cambia el intervalo de actualización o ajusta el tiempo de presencia.",
         "data": {
           "tracked_devices": "Dispositivos a rastrear",
-          "track_new_devices": "Rastrear automáticamente dispositivos nuevos detectados",
-          "scan_interval": "Intervalo de muestreo (segundos)",
-          "consider_home": "Tiempo para considerar en casa (segundos antes de marcar como ausente)"
+          "track_new_devices": "Rastrear automáticamente nuevos dispositivos descubiertos",
+          "scan_interval": "Intervalo de escaneo (segundos)",
+          "consider_home": "Período 'Consider Home' (segundos antes de marcar como ausente)"
         }
       }
     }
@@ -46,10 +46,40 @@
   "entity": {
     "sensor": {
       "active_devices": {
-        "name": "Dispositivos Activos"
+        "name": "Dispositivos activos"
       },
       "total_devices": {
-        "name": "Total de Dispositivos"
+        "name": "Total de dispositivos"
+      },
+      "cpu_usage": {
+        "name": "Uso de CPU"
+      },
+      "memory_usage": {
+        "name": "Uso de memoria"
+      },
+      "uptime": {
+        "name": "Tiempo encendido"
+      },
+      "wan_ip": {
+        "name": "Dirección IPv4 WAN"
+      },
+      "wan_ipv6": {
+        "name": "Dirección IPv6 WAN"
+      }
+    },
+    "binary_sensor": {
+      "wan_status": {
+        "name": "Conexión WAN"
+      }
+    },
+    "switch": {
+      "led_switch": {
+        "name": "LEDs frontales"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Reiniciar router"
       }
     }
   }

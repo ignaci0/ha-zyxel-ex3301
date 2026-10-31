@@ -201,7 +201,12 @@ class ZyxelOptionsFlowHandler(config_entries.OptionsFlow):
 
         device_options: dict[str, str] = {}
         if coordinator and coordinator.data:
-            for mac, d in coordinator.data.items():
+            devices_map = (
+                coordinator.data.get("devices", {})
+                if isinstance(coordinator.data, dict) and "devices" in coordinator.data
+                else coordinator.data
+            )
+            for mac, d in devices_map.items():
                 name = d.get("hostname")
                 ip = d.get("ip", "")
                 device_options[mac] = _format_device_label(mac, name, ip)

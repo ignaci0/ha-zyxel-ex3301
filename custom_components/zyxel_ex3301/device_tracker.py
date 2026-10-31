@@ -60,13 +60,14 @@ async def async_setup_entry(
     def async_add_devices(new_macs: list[str] | None = None) -> None:
         """Add newly discovered devices as entities if whitelisted."""
         entities: list[ZyxelDeviceTracker] = []
-        macs_to_check = new_macs if new_macs is not None else list(coordinator.data.keys())
+        devices_map = coordinator.data.get("devices", {}) if coordinator.data else {}
+        macs_to_check = new_macs if new_macs is not None else list(devices_map.keys())
 
         for mac in macs_to_check:
             if mac in tracked:
                 continue
 
-            dev_data = coordinator.data.get(mac)
+            dev_data = devices_map.get(mac)
             if not dev_data:
                 continue
 
@@ -106,7 +107,9 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
     @property
     def _dev_data(self) -> dict[str, Any]:
         """Return the device data from the coordinator."""
-        return self.coordinator.data.get(self._mac, {})
+        if not self.coordinator.data:
+            return {}
+        return self.coordinator.data.get("devices", {}).get(self._mac, {})
 
     @property
     def is_connected(self) -> bool:
@@ -153,17 +156,14 @@ class ZyxelDeviceTracker(CoordinatorEntity[ZyxelDataUpdateCoordinator], ScannerE
             attrs[ATTR_SNR] = data.get("snr")
         if data.get("phy_rate") is not None and data.get("phy_rate") != 0:
             attrs[ATTR_PHY_RATE] = data.get("phy_rate")
-
         return attrs
 
     @property
     def device_info(self) -> DeviceInfo:
-        """Return device registry information for this network client."""
-        hostname = self._dev_data.get("hostname")
-        friendly_name = hostname if (hostname and hostname != "Unknown") else self._mac
+        """Return device info to link this tracker to a Device entry."""
+        host = self.hostname or self._mac
         return DeviceInfo(
             connections={(CONNECTION_NETWORK_MAC, self._mac)},
-            name=friendly_name,
-            identifiers={(DOMAIN, self._mac)},
+            name=host,
             via_device_id=self.coordinator.router_device_id,
         )

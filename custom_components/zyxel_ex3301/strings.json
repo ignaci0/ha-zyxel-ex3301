@@ -46,10 +46,40 @@
   "entity": {
     "sensor": {
       "active_devices": {
-        "name": "Active Devices"
+        "name": "Active devices"
       },
       "total_devices": {
-        "name": "Total Devices"
+        "name": "Total devices"
+      },
+      "cpu_usage": {
+        "name": "CPU usage"
+      },
+      "memory_usage": {
+        "name": "Memory usage"
+      },
+      "uptime": {
+        "name": "Uptime"
+      },
+      "wan_ip": {
+        "name": "WAN IPv4 address"
+      },
+      "wan_ipv6": {
+        "name": "WAN IPv6 address"
+      }
+    },
+    "binary_sensor": {
+      "wan_status": {
+        "name": "WAN connection"
+      }
+    },
+    "switch": {
+      "led_switch": {
+        "name": "Front LEDs"
+      }
+    },
+    "button": {
+      "reboot": {
+        "name": "Reboot router"
       }
     }
   }

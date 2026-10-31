@@ -20,14 +20,26 @@ A custom Home Assistant integration that interacts with the **Zyxel EX3301-T0** 
   - Physical interface (e.g. `eth0.4`)
   - Remaining DHCP lease time
   - Wi-Fi signal metrics (`RSSI`, `SNR`, and `PhyRate` where applicable)
-- **Router Overview Sensors:**
+- **Router Metrics & Telemetry:**
+  - `sensor.<router>_cpu_usage`: Real-time CPU utilization percentage.
+  - `sensor.<router>_memory_usage`: RAM utilization percentage (with total and free memory attributes in kB).
+  - `sensor.<router>_uptime`: Router boot timestamp and uptime.
+  - `sensor.<router>_wan_ipv4_address`: Public WAN IPv4 address with gateway and DNS server attributes.
+  - `sensor.<router>_wan_ipv6_address`: Public WAN IPv6 address.
   - `sensor.<router>_active_devices`: Number of currently connected active devices.
   - `sensor.<router>_total_devices`: Total known registered devices.
+- **Port & WAN Link Connectivity:**
+  - `binary_sensor.<router>_wan_connection`: Real-time Internet connectivity status.
+  - `binary_sensor.<router>_port_<lan1..lan4/ethwan>`: Per-port physical link status, link speed (Mbps), and duplex mode.
+- **Controls & Automations:**
+  - `switch.<router>_front_leds`: Toggle front panel LEDs on/off (stealth / night mode).
+  - `button.<router>_reboot_router`: Trigger a clean restart of the router directly from Home Assistant.
 - **Config Flow & Options Flow:**
   - Configurable directly from the Home Assistant UI (**Settings > Devices & Services**).
+  - Device whitelist selection: choose exactly which devices to track.
   - Configurable polling interval (default: 30s).
-  - Configurable `consider_home` window (default: 180s) to prevent Wi-Fi power-saving flapping.
-  - Option to track all known DHCP leases or only currently active devices.
+  - Configurable `consider_home` window (default: 180s) to prevent Wi-Fi power-saving flapping (especially on smartphones).
+  - Option to automatically track newly discovered devices or only tracked whitelist.
 - **100% Local & Private:** No cloud dependencies, no external servers.
 
 ---
